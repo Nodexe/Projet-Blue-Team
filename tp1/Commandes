@@ -13,6 +13,6 @@
 	sudo sysctl -w vm.max_map_count=262144 // Elasticsearch utilise énormément de mémoire mappée (memory-mapped files) pour indexer les données rapidement. Le noyau Linux limite par défaut ce nombre à une valeur trop basse pour ELK, qui refuse de démarrer si ce n'est pas augmenté.
 	echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf // Ecrit la première commande dans sysctl.conf pour que ce changement s'applique à chaque reboot.
 
-2.3 Dossier de projet
+2.3 Dossier de projet et création du docker-compose.yml
 	mkdir -p ~/soc-lab/tp1 && cd ~/soc-lab/tp1 // Crée un dossier pour stocker notre docker-compose.yml et tout ce qui va avec (fichiers de conf etc.).
-	vi docker-compose.yml // Voir le fichier dans 
+	vi docker-compose.yml // Voir le fichier dans tp1/docker-compose.yml
