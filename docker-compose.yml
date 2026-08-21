@@ -1,0 +1,112 @@
+version: "3.8"
+
+# ==========================================================
+# TP1 - Stack SIEM (Elastic) + SOAR (Shuffle)
+# Réseau dédié pour que les conteneurs se voient par leur nom
+# ==========================================================
+
+networks:
+  soc-net:
+    driver: bridge
+
+volumes:
+  es-data:        # persistance des index Elasticsearch
+  shuffle-db:      # persistance de la base Shuffle
+
+services:
+
+  # ---------- ELASTICSEARCH ----------
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node        # mode standalone, pas de cluster
+      - xpack.security.enabled=true       # sécurité activée (obligatoire pour Fleet)
+      - ELASTIC_PASSWORD=ChangeMoiSTP123!  # mot de passe superuser 'elastic'
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"       # heap JVM, à adapter à ta RAM
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - soc-net
+
+  # ---------- KIBANA ----------
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=ChangeMoiAussiSTP123!
+    ports:
+      - "5601:5601"
+    networks:
+      - soc-net
+
+  # ---------- FLEET SERVER (pour piloter Elastic Agent depuis Kibana) ----------
+  fleet-server:
+    image: docker.elastic.co/beats/elastic-agent:8.14.3
+    container_name: fleet-server
+    depends_on:
+      - kibana
+    environment:
+      - FLEET_SERVER_ENABLE=true
+      - FLEET_SERVER_ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_URL=https://fleet-server:8220
+      - KIBANA_FLEET_SETUP=true
+      - KIBANA_HOST=http://kibana:5601
+      - KIBANA_FLEET_USERNAME=elastic
+      - KIBANA_FLEET_PASSWORD=ChangeMoiSTP123!
+    ports:
+      - "8220:8220"
+    networks:
+      - soc-net
+
+  # ---------- SHUFFLE (SOAR) ----------
+  shuffle-backend:
+    image: ghcr.io/shuffle/shuffle-backend:latest
+    container_name: shuffle-backend
+    hostname: shuffle-backend
+    environment:
+      - SHUFFLE_APP_HOTLOAD_FOLDER=./shuffle-apps
+      - SHUFFLE_FILE_LOCATION=./shuffle-files
+      - DB_LOCATION=./shuffle-database
+      - SHUFFLE_OPENSEARCH_URL=http://elasticsearch:9200
+      - SHUFFLE_OPENSEARCH_USERNAME=elastic
+      - SHUFFLE_OPENSEARCH_PASSWORD=ChangeMoiSTP123!
+    ports:
+      - "5001:5001"
+    volumes:
+      - shuffle-db:/shuffle-database
+    networks:
+      - soc-net
+
+  shuffle-frontend:
+    image: ghcr.io/shuffle/shuffle-frontend:latest
+    container_name: shuffle-frontend
+    depends_on:
+      - shuffle-backend
+    ports:
+      - "3443:443"
+    networks:
+      - soc-net
+
+  shuffle-orborus:
+    image: ghcr.io/shuffle/shuffle-orborus:latest
+    container_name: shuffle-orborus
+    environment:
+      - ENVIRONMENT_NAME=Shuffle
+      - BASE_URL=http://shuffle-backend:5001
+      - DOCKER_API_VERSION=1.40
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - soc-net
