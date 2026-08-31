@@ -49,6 +49,9 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=ChangeMoiAussiSTP123!
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=52f066bfae0379be9b41e1fdb64dfc74
+      - XPACK_REPORTING_ENCRYPTIONKEY=2f9e74926d3b7853d297928e9a19ea85
+      - XPACK_SECURITY_ENCRYPTIONKEY=be993fe65dd94856cb3434a10948cc95
     ports:
       - "5601:5601"
     networks:
@@ -58,7 +61,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 15
-
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
   # ---------- FLEET SERVER ----------
   fleet-server:
     image: docker.elastic.co/beats/elastic-agent:8.14.3
