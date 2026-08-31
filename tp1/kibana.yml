@@ -1,0 +1,7 @@
+# Sert uniquement pour autoriser le certificat autosigné du webhook Shuffle
+server.host: "0.0.0.0"
+
+xpack.actions.customHostSettings:
+  - url: "https://192.168.56.10:3443"
+    ssl:
+      verificationMode: none
