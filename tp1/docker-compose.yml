@@ -1,6 +1,6 @@
 # ==========================================================
 # TP1 - Stack SIEM (Elastic) + SOAR (Shuffle)
-# Réseau dédié pour que les conteneurs se voient par leur nom
+# Les secrets sont externalisés dans un fichier .env (non versionné)
 # ==========================================================
 
 networks:
@@ -14,13 +14,17 @@ volumes:
 services:
 
   # ---------- ELASTICSEARCH ----------
+  # Moteur de stockage et d'indexation du SIEM.
+  # Mode single-node (pas de cluster, adapté à un lab).
+  # Heap JVM volontairement bas (1.2 Go) pour tenir sur une VM de 8 Go de RAM.
+  # Authentification activée (xpack.security) : obligatoire pour Fleet.
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=ChangeMoiSTP123!
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - "ES_JAVA_OPTS=-Xms1200m -Xmx1200m"
     ulimits:
       memlock:
@@ -33,12 +37,20 @@ services:
     networks:
       - soc-net
     healthcheck:
-      test: ["CMD-SHELL", "curl -s -u elastic:ChangeMoiSTP123! http://localhost:9200/_cluster/health | grep -q '\"status\"'"]
+      # Attend qu'Elasticsearch réponde réellement (pas juste "conteneur démarré")
+      # avant d'autoriser le démarrage de Kibana.
+      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD} http://localhost:9200/_cluster/health | grep -q '\"status\"'"]
       interval: 10s
       timeout: 5s
       retries: 15
 
   # ---------- KIBANA ----------
+  # Interface web du SIEM, s'authentifie auprès d'Elasticsearch via le compte
+  # technique interne "kibana_system" (distinct du compte admin "elastic").
+  # Un kibana.yml externe est monté pour des réglages non couverts par les
+  # variables d'environnement (écoute réseau 0.0.0.0, désactivation de la
+  # vérification TLS pour le connecteur Webhook vers Shuffle en certificat
+  # auto-signé).
   kibana:
     image: docker.elastic.co/kibana/kibana:8.14.3
     container_name: kibana
@@ -48,10 +60,14 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=ChangeMoiAussiSTP123!
-      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=52f066bfae0379be9b41e1fdb64dfc74
-      - XPACK_REPORTING_ENCRYPTIONKEY=2f9e74926d3b7853d297928e9a19ea85
-      - XPACK_SECURITY_ENCRYPTIONKEY=be993fe65dd94856cb3434a10948cc95
+      - ELASTICSEARCH_PASSWORD=${KIBANA_SYSTEM_PASSWORD}
+      # Clés de chiffrement des saved objects (règles de détection, connecteurs).
+      # Doivent rester fixes : sans elles, Kibana en régénère une aléatoire à
+      # chaque redémarrage et les règles/connecteurs chiffrés deviennent
+      # illisibles. Commande de génération : docker exec kibana bin/kibana-encryption-keys generate
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${KIBANA_ENCRYPTEDSAVEDOBJECTS_KEY}
+      - XPACK_REPORTING_ENCRYPTIONKEY=${KIBANA_REPORTING_KEY}
+      - XPACK_SECURITY_ENCRYPTIONKEY=${KIBANA_SECURITY_KEY}
     ports:
       - "5601:5601"
     networks:
@@ -63,7 +79,11 @@ services:
       retries: 15
     volumes:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+
   # ---------- FLEET SERVER ----------
+  # Point de contrôle central des agents de collecte (Elastic Agent).
+  # Pousse leur policy (quoi collecter) et centralise leur statut de santé,
+  # évitant de configurer chaque agent manuellement sur chaque machine surveillée.
   fleet-server:
     image: docker.elastic.co/beats/elastic-agent:8.14.3
     container_name: fleet-server
@@ -78,13 +98,16 @@ services:
       - KIBANA_FLEET_SETUP=true
       - KIBANA_HOST=http://kibana:5601
       - KIBANA_FLEET_USERNAME=elastic
-      - KIBANA_FLEET_PASSWORD=ChangeMoiSTP123!
+      - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
     ports:
       - "8220:8220"
     networks:
       - soc-net
 
   # ---------- SHUFFLE (SOAR) ----------
+  # Backend : API et playbooks (workflows).
+  # Stocke son état dans Elasticsearch (SHUFFLE_OPENSEARCH_*) et sur disque
+  # (volume shuffle-db) pour survivre aux redémarrages de conteneur.
   shuffle-backend:
     image: ghcr.io/shuffle/shuffle-backend:latest
     container_name: shuffle-backend
@@ -95,7 +118,7 @@ services:
       - DB_LOCATION=./shuffle-database
       - SHUFFLE_OPENSEARCH_URL=http://elasticsearch:9200
       - SHUFFLE_OPENSEARCH_USERNAME=elastic
-      - SHUFFLE_OPENSEARCH_PASSWORD=ChangeMoiSTP123!
+      - SHUFFLE_OPENSEARCH_PASSWORD=${ELASTIC_PASSWORD}
     ports:
       - "5001:5001"
     volumes:
@@ -103,6 +126,8 @@ services:
     networks:
       - soc-net
 
+  # Frontend : interface web de Shuffle (édition visuelle des playbooks),
+  # exposée en HTTPS avec certificat auto-signé sur le port 3443.
   shuffle-frontend:
     image: ghcr.io/shuffle/shuffle-frontend:latest
     container_name: shuffle-frontend
@@ -113,6 +138,9 @@ services:
     networks:
       - soc-net
 
+  # Orborus : orchestrateur qui lance dynamiquement des conteneurs Docker
+  # éphémères pour exécuter chaque étape (bloc) d'un playbook. Nécessite un
+  # accès au socket Docker de l'hôte pour pouvoir créer ces conteneurs.
   shuffle-orborus:
     image: ghcr.io/shuffle/shuffle-orborus:latest
     container_name: shuffle-orborus
