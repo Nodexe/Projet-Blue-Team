@@ -105,6 +105,5 @@ tp1-elk-soar/
 ├── kibana.yml
 ├── .env.example
 ├── .gitignore
-├── screenshots/
 └── playbook-shuffle-export.json
 ```
