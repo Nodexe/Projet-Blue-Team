@@ -26,7 +26,6 @@ L'objectif n'est pas de configurer des outils isolément, mais de prouver une **
 <img width="819" height="1030" alt="finale" src="https://github.com/user-attachments/assets/c4776665-6c79-4243-8dc6-8dfd52466bac" />
 
 
-*(Schéma détaillé à insérer ici)*
 
 **4 VMs** :
 
@@ -55,12 +54,12 @@ L'objectif n'est pas de configurer des outils isolément, mais de prouver une **
 1. **Attaque** — Hydra lance une attaque par brute force SSH contre VM-CIBLE
 2. **Ingestion** — Elastic Agent collecte les logs d'authentification (`/var/log/auth.log`) et les envoie à Elasticsearch
 3. **Détection** — une règle Kibana déclenche une alerte critique après 5 échecs d'authentification en moins de 2 minutes depuis la même IP
-4. **Automatisation** — l'alerte envoie un Webhook à Shuffle, qui exécute un playbook : extraction de l'IP source, appel à l'API REST de pfSense
+4. **Automatisation** — l'alerte envoie un Webhook à Shuffle, qui exécute un playbook : appel à l'API REST de pfSense et application du changement
 5. **Remédiation** — pfSense ajoute l'IP à un alias `SOAR_Blocklist`, bloqué par une règle firewall en amont — l'attaquant est banni automatiquement
 
-*(Captures d'écran à insérer : Discover avec logs bruts, règle de détection, alerte déclenchée, playbook Shuffle exécuté, IP bloquée dans pfSense)*
+*(Captures d'écran à insérer : Discover avec logs bruts, alerte déclenchée, playbook Shuffle exécuté, IP bloquée dans pfSense)*
 
----
+
 
 ## Ce que ce projet démontre
 
