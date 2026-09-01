@@ -67,7 +67,6 @@ L'objectif n'est pas de configurer des outils isolément, mais de prouver une **
 - Écriture de règles de détection et mapping MITRE ATT&CK
 - Construction d'un playbook SOAR avec appel API REST
 - Segmentation réseau et administration pare-feu (pfSense)
-- Gestion des secrets (variables d'environnement, `.env` non versionné)
 - Troubleshooting réseau et applicatif en environnement conteneurisé multi-VM
 
 ---
@@ -75,9 +74,9 @@ L'objectif n'est pas de configurer des outils isolément, mais de prouver une **
 ## Limites connues et pistes d'amélioration
 
 - **TLS auto-signé** : l'enrôlement des agents Elastic utilise `--insecure` (acceptable en lab, à remplacer par une CA interne en production)
-- **Licence Elastic** : les actions sur les règles de détection nécessitent une licence Gold+ (trial utilisé ici)
+- **Licence Elastic** : les actions sur les règles de détection nécessitent une licence (trial utilisé ici)
 - **Package pfSense REST API** : non officiel, doit être réinstallé après chaque mise à jour de pfSense
-- **Ressources limitées** : heap Elasticsearch réduit (1.2 Go) pour tenir sur 8 Go de RAM — non représentatif d'un déploiement de production
+- **Ressources limitées** : Elasticsearch réduit (1.2 Go) pour tenir sur 8 Go de RAM — non représentatif d'un déploiement de production
 
 ---
 
@@ -93,10 +92,3 @@ tp1-elk-soar/
 ├── screenshots/
 └── playbook-shuffle-export.json
 ```
-
----
-
-## Pour aller plus loin
-
-Le guide d'installation détaillé, étape par étape avec toutes les commandes, est disponible dans [`INSTALLATION.md`](./INSTALLATION.md).
-
