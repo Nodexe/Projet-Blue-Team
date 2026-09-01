@@ -16,30 +16,15 @@ L'objectif n'est pas de configurer des outils isolément, mais de prouver une **
 **Trois points clés de ce projet :**
 - Chaîne complète, pas un outil isolé
 - Automatisation réelle (pas de playbook exécuté à la main)
-- Mapping MITRE ATT&CK (méthodologie, pas du bricolage)
+- Mapping MITRE ATT&CK (méthodologie)
 
 ---
 
 ## Architecture
 
-```
-┌─────────────────┐        SSH Brute Force        ┌──────────────────────┐
-│   VM-KALI         │ ─────────────────────────────▶ │   VM-CIBLE (Ubuntu)   │
-│  (Attaquant)       │                                │  + Elastic Agent       │
-└─────────────────┘                                └──────────┬───────────┘
-                                                                 │ logs (auth.log)
-                                                                 ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│  VM-DOCKER                                                              │
-│  Elasticsearch → Kibana → Shuffle (SOAR)                                │
-└──────────────────────────────────────────────────────┼─────────────────┘
-                                                          │ API REST
-                                                          ▼
-                                                 ┌──────────────────┐
-                                                 │   VM-PFSENSE       │
-                                                 │  Firewall (Blocklist)│
-                                                 └──────────────────┘
-```
+
+<img width="819" height="1030" alt="finale" src="https://github.com/user-attachments/assets/c4776665-6c79-4243-8dc6-8dfd52466bac" />
+
 
 *(Schéma détaillé à insérer ici)*
 
