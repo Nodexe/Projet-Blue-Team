@@ -104,6 +104,5 @@ tp1-elk-soar/
 ├── docker-compose.yml
 ├── kibana.yml
 ├── .env.example
-├── .gitignore
-└── playbook-shuffle-export.json
+└── .gitignore
 ```
