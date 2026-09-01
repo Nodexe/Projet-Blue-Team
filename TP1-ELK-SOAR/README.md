@@ -57,9 +57,25 @@ L'objectif n'est pas de configurer des outils isolément, mais de prouver une **
 4. **Automatisation** — l'alerte envoie un Webhook à Shuffle, qui exécute un playbook : appel à l'API REST de pfSense et application du changement
 5. **Remédiation** — pfSense ajoute l'IP à un alias `SOAR_Blocklist`, bloqué par une règle firewall en amont — l'attaquant est banni automatiquement
 
-*(Captures d'écran à insérer : Discover avec logs bruts, alerte déclenchée, playbook Shuffle exécuté, IP bloquée dans pfSense)*
+**Début de l'attaque Hydra (brute force SSH)**
 
+<img width="660" height="483" alt="Capture d’écran 2026-09-01 121247" src="https://github.com/user-attachments/assets/c0da730d-ee03-45f2-a97c-1b7bc564ba38" />
 
+**Logs bruts dans Discover**
+<img width="2051" height="381" alt="Capture d’écran 2026-09-01 121520" src="https://github.com/user-attachments/assets/b2a2e920-7e8f-4d45-a67e-ba56e9cd28ba" />
+
+**Alerte déclenchée**
+<img width="2078" height="850" alt="Capture d’écran 2026-09-01 121654" src="https://github.com/user-attachments/assets/24b1a1db-0a61-4c70-85b6-ca7526dc1dbc" />
+
+**Playbook Shuffle exécuté**
+
+<img width="459" height="1110" alt="Capture d’écran 2026-09-01 121819" src="https://github.com/user-attachments/assets/55daceb3-0870-440e-872f-a404c2f5fcc1" />
+<img width="461" height="801" alt="Capture d’écran 2026-09-01 121841" src="https://github.com/user-attachments/assets/77f09c8f-32e3-4130-8005-3c241262662c" />
+
+**IP de l'attaquant bloqué dans Pfsense**
+
+<img width="1158" height="155" alt="Capture d’écran 2026-09-01 121932" src="https://github.com/user-attachments/assets/055ff804-cf64-4667-999d-0f99a666b477" />
+<img width="1165" height="530" alt="Capture d’écran 2026-09-01 122101" src="https://github.com/user-attachments/assets/5454568b-e97d-497b-ba1d-2c05e498140f" />
 
 ## Ce que ce projet démontre
 
