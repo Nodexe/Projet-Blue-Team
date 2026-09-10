@@ -10,7 +10,7 @@
 
 Ce TP démontre la capacité d'analyse technique **post-mortem** : retracer, après coup, les actions d'un attaquant sur un système compromis, sans avoir assisté à l'attaque en direct.
 
-Un serveur (VM-CIBLE, réutilisée du [TP1](TP1-ELK-SOAR)) a été volontairement compromis via un scénario réaliste : accès initial par identifiants faibles, exploitation d'un binaire SUID mal configuré pour élever ses privilèges, puis création d'un compte de persistance caché. L'objectif est de reconstituer cette chronologie **uniquement à partir des preuves numériques**, en respectant les bonnes pratiques d'intégrité forensic (copie bit-à-bit, hash, analyse en lecture seule).
+Un serveur (VM-CIBLE, réutilisée du [TP1](../TP1-ELK-SOAR)) a été volontairement compromis via un scénario réaliste : accès initial par identifiants faibles, exploitation d'un binaire SUID mal configuré pour élever ses privilèges, puis création d'un compte de persistance caché. L'objectif est de reconstituer cette chronologie **uniquement à partir des preuves numériques**, en respectant les bonnes pratiques d'intégrité forensic (copie bit-à-bit, hash, analyse en lecture seule).
 
 ## Ce que ce projet démontre
 
