@@ -8,7 +8,7 @@
 
 ## Objectif
 
-Ce TP démontre la capacité d'analyse technique **post-mortem** d'un profil SOC/Blue Team : retracer, après coup, les actions d'un attaquant sur un système compromis — sans avoir assisté à l'attaque en direct.
+Ce TP démontre la capacité d'analyse technique **post-mortem** : retracer, après coup, les actions d'un attaquant sur un système compromis, sans avoir assisté à l'attaque en direct.
 
 Un serveur (VM-CIBLE, réutilisée du [TP1](../tp1-elk-soar)) a été volontairement compromis via un scénario réaliste : accès initial par identifiants faibles, exploitation d'un binaire SUID mal configuré pour élever ses privilèges, puis création d'un compte de persistance caché. L'objectif est de reconstituer cette chronologie **uniquement à partir des preuves numériques**, en respectant les bonnes pratiques d'intégrité forensic (copie bit-à-bit, hash, analyse en lecture seule).
 
@@ -19,7 +19,6 @@ Un serveur (VM-CIBLE, réutilisée du [TP1](../tp1-elk-soar)) a été volontaire
 - Threat hunting dans les journaux système (`auth.log`, `syslog`, historiques shell)
 - Reconstitution de timeline d'incident à partir de sources multiples
 - Identification d'une faille d'élévation de privilèges (SUID) et explication technique de son exploitation
-- **Compréhension fine des limites méthodologiques** : distinction entre élévation de privilèges silencieuse (SUID) et élévation journalisée (sudo), rotation de logs, intégrité de la preuve à travers une pile LVM
 
 ## Scénario reconstitué
 
@@ -37,7 +36,7 @@ Un serveur (VM-CIBLE, réutilisée du [TP1](../tp1-elk-soar)) a été volontaire
 - **Acquisition** : `qemu-img` (conversion VMDK → RAW), partage réseau VMware (hgfs)
 - **Intégrité** : `sha256sum`
 - **Montage forensic** : `losetup`, LVM (`pvscan`, `vgscan`, `vgchange`, `vgrename`), `mount -o ro`
-- **Analyse** : `fdisk`, `grep`, `find -perm`, exploration de logs Linux (`auth.log`, `syslog`, `.bash_history`)
+- **Analyse** : `fdisk`, `grep`, exploration de logs Linux (`auth.log`, `syslog`, `.bash_history`)
 
 ## Limites connues et enseignements
 
@@ -58,4 +57,4 @@ tp2-forensic-dfir/
     └── timeline/ (preuves de la chronologie)
 ```
 
-⚠️ L'image disque (`.raw`) et le fichier de hash ne sont pas versionnés ici (volumineux et données simulées sensibles) — seules les captures d'écran et les commandes documentées le sont.
+⚠️ L'image disque (`.raw`) et le fichier de hash ne sont pas versionnés ici (trop volumineux) — seules les captures d'écran et les commandes documentées le sont.
