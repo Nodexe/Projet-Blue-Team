@@ -77,10 +77,10 @@ whoami
 
 **Action de persistance** :
 ```bash
-useradd -M -N -r -s /bin/bash backdoor_user
+useradd -M -N -r -s /bin/bash backdoor_user # L'attribut "-M" permet de ne pas créer de répertoire pour l'utilisateur, ce qui est nécéssaire pour un attaquant qui ne veut pas se faire repérer. Or j'ai omis cette attribut ce qui 
 echo "backdoor_user:pass123" | chpasswd
 ```
-
+⚠️ **Écart constaté entre la théorie et l'exécution réelle** : lors de la manipulation sur le lab, ce flag `-M` a été omis par erreur — un dossier `/home/backdoor_user` a donc bien été créé, comme le montre la capture d'écran de la timeline (étape 5).
 ⚠️ **Point de méthode important** : la session SSH doit être fermée **proprement** (`exit`) pour que `.bash_history` soit bien écrit sur disque — une déconnexion brutale empêche l'écriture de l'historique.
 
 ### 1.4 Vérifier que les traces sont bien présentes
