@@ -86,12 +86,6 @@ echo "backdoor_user:pass123" | chpasswd
 ### 1.4 Vérifier que les traces sont bien présentes
 
 ```bash
-sudo cat /var/log/auth.log | tail -30
-```
-
-![Extrait auth.log après simulation](./screenshots/01-auth-log-tail.png)
-
-```bash
 cat ~/.bash_history
 ```
 
