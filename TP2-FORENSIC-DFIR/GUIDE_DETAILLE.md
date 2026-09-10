@@ -267,10 +267,9 @@ grep backdoor_user /mnt/forensic_vmcible/etc/passwd
 
 ---
 
-## 5. Démonter proprement l'image en fin d'analyse
+## 5. Vérification d'intégrité de l'image en fin d'analyse
 
 ```bash
-sudo umount /mnt/forensic_vmcible
 sha256sum vmcible_evidence.raw
 ```
 
