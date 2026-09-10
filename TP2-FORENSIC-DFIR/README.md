@@ -41,7 +41,7 @@ Un serveur (VM-CIBLE, réutilisée du [TP1](../TP1-ELK-SOAR)) a été volontaire
 ## Limites connues et enseignements
 
 - **Acquisition depuis l'hyperviseur (fichier `.vmdk`)** plutôt que `dd` interne à la VM compromise — évite d'utiliser des binaires potentiellement altérés par l'attaquant, plus proche d'une bonne pratique forensic réelle
-- **LVM et intégrité de la preuve** : une divergence de hash a été constatée entre l'acquisition initiale et une analyse ultérieure, causée par `losetup` sans le flag `-r` combiné à l'activation LVM (`vgchange -ay`), qui écrit des métadonnées internes même lorsque le point de montage final est en lecture seule. Voir la section dédiée dans le guide détaillé — c'est une limite réelle et documentée de LVM en contexte forensic, pas une simple erreur de manipulation
+- **LVM et intégrité de la preuve** : une divergence de hash a été constatée entre l'acquisition initiale et une analyse ultérieure, causée par `losetup` sans le flag `-r` combiné à l'activation LVM (`vgchange -ay`), qui écrit des métadonnées internes même lorsque le point de montage final est en lecture seule. Voir la section dédiée dans le guide détaillé — c'est une limite réelle et documentée de LVM en contexte forensic.
 - **Rotation des logs** : une partie des preuves clés (connexion SSH initiale) se trouvait dans un fichier archivé (`auth.log.1`), pas dans le fichier actif — rappel qu'une investigation doit toujours couvrir les logs rotés
 - **`.bash_history` incomplet après un pivot de shell** : les commandes exécutées depuis le shell obtenu via l'exploit SUID (`/bin/sh`) ne sont pas journalisées comme le ferait `bash` — la preuve d'impact repose alors sur les journaux système plutôt que sur l'historique shell
 
