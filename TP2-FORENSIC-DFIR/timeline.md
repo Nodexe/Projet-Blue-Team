@@ -18,10 +18,6 @@ Chronologie reconstituée à partir de trois sources croisées : `auth.log` (et 
 
 Les commandes issues de `.bash_history` ne sont pas horodatées individuellement — limitation native de Bash sans `HISTTIMEFORMAT` activé au moment du scénario. Leur position dans la timeline est déduite de leur ordre d'exécution, encadrée par la connexion SSH (10:00:02) et la première trace horodatée suivante (10:01:20, création du compte).
 
-## Note d'analyse — élévation silencieuse vs élévation journalisée
-
-L'élévation de privilèges réelle a eu lieu dès l'exécution de `find_vuln -exec /bin/sh -p` (avant 10:01:20), via le mécanisme SUID du noyau — sans générer d'entrée "session opened for user root" dans `auth.log`, contrairement à un usage légitime de `sudo`. Cette absence de journalisation constitue en elle-même une signature technique de l'exploitation SUID, à ne pas confondre avec une éventuelle session `sudo` légitime apparaissant plus tard dans les logs pour une action distincte.
-
 ---
 
 ## Preuves associées (captures d'écran)
